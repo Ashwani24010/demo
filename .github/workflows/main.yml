@@ -9,7 +9,7 @@ jobs:
   build_and_publish_image_in_dockerhub:
     runs-on: ubuntu-latest
     name   : Build image and push
- 
+  
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
