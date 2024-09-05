@@ -27,8 +27,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .  # If Dockerfile is in the root, keep this as is
-          file: ./path/to/Dockerfile  # Add this if Dockerfile is in a subdirectory
+          context: .  # Keep this as the context points to the root directory
           push: true
           tags: |
             ashwani17/hello-ashwani-flask:${{ github.ref_name }}
