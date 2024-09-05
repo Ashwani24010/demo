@@ -19,12 +19,12 @@ jobs:
  
     - name: Build and tag Docker image
       run: |
-        docker build --file Dockerfile -t ${{ secrets.DOCKER_USER }}/api-flask-ashwani:${{github.ref_name}} .
+        docker build --file Dockerfile -t ${{ secrets.DOCKER_USER }}/hello-world-flask:${{github.ref_name}} .
     
     - name: Push Docker image to DockerHub
       run: |
-        docker push ${{ secrets.DOCKER_USER }}/api-flask-ashwani:${{github.ref_name}}
+        docker push ${{ secrets.DOCKER_USER }}/hello-world-flask:${{github.ref_name}}
  
     - name: Run Flask application in Docker container
       run: |
-        docker run -d -p 5000:5000 ${{ secrets.DOCKER_USER }}/api-flask-vivek:${{github.ref_name}}
+        docker run -d -p 5000:5000 ${{ secrets.DOCKER_USER }}/hello-world-flask:${{github.ref_name}}
