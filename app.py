@@ -1,9 +1,10 @@
 #importing Flask class from the flask package .
 from flask import Flask,request,jsonify
 import sqlite3 
+import psycopg2
 
 #initializing an application sever and passing the name of the current module by __name__ .
-app = Flask(__name__) 
+app = Flask(__name__)  
 
 # $env:FLASK_ENV="development" : - this is used to set the env varible so that we should not start server again
 # and again on changes .
@@ -11,37 +12,80 @@ app = Flask(__name__)
 #making databse connection 
 
 def db_connection():
-    con = None 
-    try:
-        con = sqlite3.Connection("books.sqlite")
-    except sqlite3.Error as e:
-        print(e)
-    
+    con = psycopg2.connect(
+        database="postgres",
+        user="postgres",
+        password="root",
+        host="localhost" , port="5432"
+    )
+
     return con 
 
 
+@app.route("/",methods = ['GET'])
+def create():
+    con = db_connection() 
 
-@app.route('/getBooks')
+    if con is None :
+        return "Connection established"
+
+    cur = con.cursor() 
+
+
+    try :
+        query = """ CREATE TABLE IF NOT EXISTS products (id int PRIMARY KEY, price int);"""
+        
+        cur.execute(query=query) 
+        print(cur) 
+    except Exception as e:
+        print(e) 
+
+    con.commit() 
+    if cur is not None :
+        return "Table is created " 
+    else :
+        return "Table not created" 
+
+
+@app.route('/getProducts')
 def hello():
     con = db_connection() 
     cursor = con.cursor()
 
     cursor.execute('select * from products;')
 
+    books = [
+        dict(id=row[0] ,price = row[1])
+        for row in cursor.fetchall()
+    ]
+
+    # books = cursor.fetchall() 
+
+    if books is not None :
+        return jsonify(books)
+
+
 #this is a dynamic route whatever we write after the / it takes it as a route for this endpoint .
 #In order to access it we should have declare the variable in the function .
-@app.route('/createBook', methods='POST')
+@app.route('/createProduct', methods=['POST'])
 def home():
-    name = request.form['name'] 
-    con = db_connection() 
-    cursor = con.cursor()
 
-    query = """create table products (
-        name varchar 
-    )""" 
+    con = db_connection()  
 
-    cursor.execute(query)
-    cursor.execute(f'insert into products values({name})')
+    prod_id = request.form['id'] 
+    prod_price = request.form['price']
+    
+
+    if con is None :
+        print("Connection not established ")
+
+    cursor = con.cursor() 
+    data = (prod_id,prod_price)
+    cursor.execute('insert into products (id,price) values(%s,%s);',data) 
+    
+    con.commit()
+
+    return f"Books with the id:{cursor.lastrowid} crreated successfully" 
 
 
 
