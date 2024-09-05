@@ -42,7 +42,7 @@ def create():
 
     con.commit() 
     if cur is not None :
-        return "Table is created " 
+        return "Table is created in the database " 
     else :
         return "Table not created" 
 
